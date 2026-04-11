@@ -1,0 +1,19 @@
+{
+  "name": "auth",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "cross-env NODE_ENV=production node dist/index.js"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.19.13",
+    "hono": "^4.12.12"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.17",
+    "cross-env": "^10.1.0",
+    "tsx": "^4.7.1",
+    "typescript": "^5.8.3"
+  }
+}

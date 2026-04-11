@@ -1,0 +1,12 @@
+{
+  "name": "Vanguard",
+  "scripts": {
+    "build": "pnpm --parallel --filter web --filter auth build",
+    "dev": "pnpm --parallel --filter web --filter auth dev",
+    "start": "pnpm --parallel --filter auth start"
+  },
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "pnpm": ">=10.30.0"
+  }
+}
