@@ -6,7 +6,11 @@ import { serve } from '@hono/node-server'
 import { serveStatic } from '@hono/node-server/serve-static'
 import { Hono } from 'hono'
 
+import { authApp } from './routes/auth.js'
+
 const app = new Hono()
+
+app.route('/_auth', authApp)
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const webDistRoot = resolve(__dirname, '../../web/dist')
@@ -16,10 +20,6 @@ if (isProd) {
   app.use('/*', serveStatic({ root: webDistRoot }))
   app.get('/*', async (c) => {
     return c.html(await readFile(join(webDistRoot, 'index.html'), 'utf-8'))
-  })
-} else {
-  app.get('/', (c) => {
-    return c.text('Hello Hono!')
   })
 }
 

@@ -15,6 +15,14 @@ const config = defineConfig({
     tanstackRouter({ target: 'react', autoCodeSplitting: true }),
     viteReact(),
   ],
+  server: {
+    proxy: {
+      '/_auth': {
+        target: 'http://localhost:3001/_auth',
+        changeOrigin: true,
+      },
+    },
+  },
 })
 
 export default config
