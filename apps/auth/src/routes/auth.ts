@@ -25,13 +25,8 @@ function verifyPassword(password: string, stored: string): boolean {
   }
 }
 
-export const authApp = new Hono();
-
-authApp.get("/", (c) => {
-  return c.json({ ok: true });
-});
-
-authApp.post("/login", async (c) => {
+export const authApp = new Hono()
+.post("/login", async (c) => {
   const body = (await c.req.json().catch(() => null)) as {
     loginId?: string;
     password?: string;
@@ -79,9 +74,8 @@ authApp.post("/login", async (c) => {
   });
 
   return c.json({ ok: true, loginId: user.loginId });
-});
-
-authApp.post("/logout", async (c) => {
+})
+.post("/logout", async (c) => {
   const sid = getCookie(c, SESSION_COOKIE);
   if (sid) {
     await db.delete(sessions).where(eq(sessions.id, sid));
@@ -96,9 +90,8 @@ authApp.post("/logout", async (c) => {
   }
   deleteCookie(c, SESSION_COOKIE, { path: "/" });
   return c.json({ ok: true });
-});
-
-authApp.get("/verify", async (c) => {
+})
+.get("/verify", async (c) => {
   const sid = getCookie(c, SESSION_COOKIE);
   if (!sid) {
     return c.json({ ok: false }, 401);

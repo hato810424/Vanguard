@@ -18,7 +18,7 @@ const config = defineConfig({
   server: {
     proxy: {
       '/_auth': {
-        target: 'http://localhost:3001/_auth',
+        target: 'http://localhost:3001',
         changeOrigin: true,
       },
     },

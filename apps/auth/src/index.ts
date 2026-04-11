@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url'
 import { serve } from '@hono/node-server'
 import { serveStatic } from '@hono/node-server/serve-static'
 import { Hono } from 'hono'
+import { logger } from 'hono/logger'
 
 import { authApp } from './routes/auth.js'
 
@@ -21,6 +22,8 @@ if (isProd) {
   app.get('/*', async (c) => {
     return c.html(await readFile(join(webDistRoot, 'index.html'), 'utf-8'))
   })
+} else {
+  app.use('*', logger())
 }
 
 serve(
