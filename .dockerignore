@@ -1,0 +1,10 @@
+# `node_modules` だけだとルート直下のみ除外され、apps/*/node_modules がコンテキストに入り
+# ホストの絶対パス symlink がイメージに混ざって vite 等が MODULE_NOT_FOUND になる。
+**/node_modules
+node_modules
+.git
+**/.turbo
+**/dist
+.env
+.env.*
+!.env.example

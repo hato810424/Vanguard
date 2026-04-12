@@ -41,7 +41,7 @@ export const authApp = new Hono()
     if (userCount[0].count === 0) {
       return c.json({ create: true });
     }
-    return c.notFound();
+    return c.json({ health: true });
   }
 )
 .post(
