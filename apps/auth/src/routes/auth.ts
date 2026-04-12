@@ -1,7 +1,9 @@
 import { randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
 
-import { eq } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 import { Hono } from "hono";
+import { zValidator } from "@hono/zod-validator";
+import { z } from "zod";
 import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 
 import { db } from "../db/dbConnect.js";
@@ -10,6 +12,12 @@ import { getRedis, sessionCacheKey } from "../redis/client.js";
 
 const SESSION_COOKIE = "session";
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7;
+
+function hashPassword(password: string): string {
+  const salt = randomBytes(16).toString("hex");
+  const hashBuf = scryptSync(password, salt, 64);
+  return `${salt}:${hashBuf.toString("hex")}`;
+}
 
 function verifyPassword(password: string, stored: string): boolean {
   const parts = stored.split(":");
@@ -26,6 +34,36 @@ function verifyPassword(password: string, stored: string): boolean {
 }
 
 export const authApp = new Hono()
+.get(
+  "/",
+  async (c) => {
+    const userCount = await db.select({ count: count() }).from(users);
+    if (userCount[0].count === 0) {
+      return c.json({ create: true });
+    }
+    return c.notFound();
+  }
+)
+.post(
+  "/create",
+  zValidator('json', z.object({
+    loginId: z.string().min(1),
+    password: z.string().min(1),
+  })),
+  async (c) => {
+    const userCount = await db.select({ count: count() }).from(users);
+    if (userCount[0].count !== 0) {
+      return c.json({ error: "user already exists" }, 400);
+    }
+
+    const body = c.req.valid("json");
+    await db.insert(users).values({
+      loginId: body.loginId,
+      passwordHash: hashPassword(body.password),
+    });
+    return c.json({ ok: true, loginId: body.loginId });
+  }
+)
 .post("/login", async (c) => {
   const body = (await c.req.json().catch(() => null)) as {
     loginId?: string;
