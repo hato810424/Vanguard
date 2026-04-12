@@ -132,7 +132,7 @@ export const authApp = new Hono()
 .get("/verify", async (c) => {
   const sid = getCookie(c, SESSION_COOKIE);
   if (!sid) {
-    return c.json({ ok: false }, 401);
+    return c.body(null, 401);
   }
 
   const redis = getRedis();
@@ -140,7 +140,7 @@ export const authApp = new Hono()
     try {
       const cached = await redis.get(sessionCacheKey(sid));
       if (cached) {
-        return c.json({ ok: true, loginId: cached });
+        return c.body(null, 204);
       }
     } catch (err) {
       console.error("redis get (session)", err);
@@ -155,7 +155,7 @@ export const authApp = new Hono()
   const session = row[0];
   if (!session) {
     deleteCookie(c, SESSION_COOKIE, { path: "/" });
-    return c.json({ ok: false }, 401);
+    return c.body(null, 401);
   }
 
   if (redis) {
@@ -170,5 +170,5 @@ export const authApp = new Hono()
     }
   }
 
-  return c.json({ ok: true, loginId: session.loginId });
+  return c.body(null, 204);
 });
