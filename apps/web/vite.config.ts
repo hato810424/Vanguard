@@ -8,6 +8,7 @@ import viteReact from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
 const config = defineConfig({
+  base: '/_auth',
   plugins: [
     devtools(),
     tsconfigPaths({ projects: ['./tsconfig.json'] }),
@@ -16,8 +17,10 @@ const config = defineConfig({
     viteReact(),
   ],
   server: {
+    host: true,
+    port: 3000,
     proxy: {
-      '/_auth': {
+      '/_auth/api': {
         target: 'http://localhost:3001',
         changeOrigin: true,
       },

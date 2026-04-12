@@ -3,6 +3,7 @@ import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { routeTree } from './routeTree.gen'
 
 const router = createRouter({
+  basepath: '/_auth',
   routeTree,
   defaultPreload: 'intent',
   scrollRestoration: true,

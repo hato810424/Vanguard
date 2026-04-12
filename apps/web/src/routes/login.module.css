@@ -1,0 +1,137 @@
+.main {
+  width: min(1080px, calc(100% - 2rem));
+  margin-inline: auto;
+  padding: 3rem 1rem;
+}
+
+.card {
+  max-width: 28rem;
+  margin-inline: auto;
+  padding: 1.75rem 1.5rem;
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: color-mix(in oklab, var(--surface-strong) 92%, transparent);
+}
+
+.kicker {
+  margin: 0 0 0.5rem;
+  font-size: 0.69rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--kicker);
+}
+
+.title {
+  margin: 0 0 0.35rem;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--sea-ink);
+}
+
+.desc {
+  margin: 0 0 1.5rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--sea-ink-soft);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--sea-ink);
+}
+
+.input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.6rem 0.85rem;
+  font: inherit;
+  color: var(--sea-ink);
+  border: 1px solid var(--line);
+  border-radius: 0.65rem;
+  background: var(--surface-strong);
+  outline: none;
+}
+
+.input:focus {
+  border-color: color-mix(in oklab, var(--lagoon-deep) 45%, var(--line));
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--lagoon) 35%, transparent);
+}
+
+.input::placeholder {
+  color: color-mix(in oklab, var(--sea-ink-soft) 50%, transparent);
+}
+
+.error {
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: var(--sea-ink);
+  border: 1px solid color-mix(in oklab, #c00 28%, var(--line));
+  border-radius: 0.65rem;
+  background: color-mix(in oklab, #c00 8%, var(--surface-strong));
+}
+
+.submit {
+  margin-top: 0.25rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--lagoon-deep);
+  cursor: pointer;
+  border: 1px solid color-mix(in oklab, var(--lagoon-deep) 35%, var(--line));
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--lagoon) 22%, transparent);
+}
+
+.submit:hover:not(:disabled) {
+  background: color-mix(in oklab, var(--lagoon) 32%, transparent);
+}
+
+.submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.footer {
+  margin: 1.5rem 0 0;
+  font-size: 0.875rem;
+  text-align: center;
+  color: var(--sea-ink-soft);
+}
+
+.backLink {
+  font-weight: 600;
+  color: var(--lagoon-deep);
+  text-decoration: none;
+}
+
+.backLink:hover {
+  text-decoration: underline;
+}
+
+@media (min-width: 640px) {
+  .card {
+    padding: 2rem 2rem;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+}
