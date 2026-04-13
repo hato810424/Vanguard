@@ -5,6 +5,7 @@ import { serve } from '@hono/node-server'
 import { serveStatic } from '@hono/node-server/serve-static'
 import { Hono } from 'hono'
 import { logger } from 'hono/logger'
+import { HTTPException } from 'hono/http-exception'
 
 import { authApp } from './routes/auth.js'
 import { readFileSync } from 'node:fs';
@@ -13,6 +14,7 @@ const app = new Hono()
 
 // auth の routes を追加
 app.route('/_auth/api', authApp)
+app.all('/_auth/api/*', (c) => { throw new HTTPException(404, { message: 'not found' }) })
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const webDistRoot = resolve(__dirname, '../../web/dist')
