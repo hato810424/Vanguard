@@ -75,6 +75,9 @@ importers:
       '@tanstack/router-plugin':
         specifier: ^1.132.0
         version: 1.167.14(@tanstack/react-router@1.168.15(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(vite@7.3.2(@types/node@22.19.17)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0))
+      hono:
+        specifier: ^4.12.12
+        version: 4.12.12
       lucide-react:
         specifier: ^0.545.0
         version: 0.545.0(react@19.2.5)

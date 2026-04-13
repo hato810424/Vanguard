@@ -3,6 +3,8 @@ import { type SubmitEvent, useEffect, useState } from 'react'
 
 import { brand } from '../brand'
 import styles from './login.module.css'
+import { honoClient } from '#/honoClient'
+import type { InferResponseType } from 'hono'
 
 function safeReturnPath(next: string | undefined): string {
   if (!next) return '/'
@@ -27,6 +29,9 @@ export const Route = createFileRoute('/')({
 
 type PageMode = 'login' | 'create'
 
+const $user = honoClient.index.$get;
+type UserResponse = InferResponseType<typeof $user>
+
 function LoginPage() {
   const { next } = Route.useSearch()
   const [mode, setMode] = useState<PageMode>('login')
@@ -35,29 +40,34 @@ function LoginPage() {
   const [error, setError] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
   const isCreate = mode === 'create'
+  
+  const [user, setUser] = useState<UserResponse | undefined>()
 
   useEffect(() => {
     let cancelled = false
     ;(async () => {
       try {
-        const res = await fetch('/_auth/api', { credentials: 'include' })
+        const res = await honoClient.index.$get()
         if (cancelled) return
-        if (res.ok) {
-          const data = (await res.json().catch(() => ({}))) as {
-            create?: boolean
-          }
-          if (data.create) {
-            setMode('create')
-            return
-          }
+        if (res.status === 404) {
+          setMode('create')
+          return
         }
+
+        if (res.ok) {
+          const data = await res.json()
+          setUser(data as UserResponse)
+        }
+
         setMode('login')
       } catch {
         if (!cancelled) setMode('login')
+        setUser(undefined)
       }
     })()
     return () => {
       cancelled = true
+      setUser(undefined)
     }
   }, [])
 

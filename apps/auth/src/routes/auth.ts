@@ -9,6 +9,7 @@ import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 import { db } from "../db/dbConnect.js";
 import { sessions, users } from "../db/schema.js";
 import { getRedis, sessionCacheKey } from "../redis/client.js";
+import { HTTPException } from "hono/http-exception";
 
 const SESSION_COOKIE = "session";
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7;
@@ -33,17 +34,57 @@ function verifyPassword(password: string, stored: string): boolean {
   }
 }
 
-export const authApp = new Hono()
+export const authApp = new Hono<{ Variables: { user: { cached: string; sid: string } } }>()
+// 認証情報埋め込み
+.use(async (c, next) => {
+  const sid = getCookie(c, SESSION_COOKIE);
+  if (!sid) {
+    return next();
+  }
+
+  const redis = getRedis();
+  if (redis) {
+    try {
+      const cached = await redis.get(sessionCacheKey(sid));
+      if (cached) {
+        c.set("user", {
+          cached,
+          sid: sid,
+        });
+        return next();
+      }
+    } catch (err) {
+      console.error("redis get (session)", err);
+    }
+  }
+})
+// ユーザー情報取得
 .get(
   "/",
   async (c) => {
     const userCount = await db.select({ count: count() }).from(users);
     if (userCount[0].count === 0) {
-      return c.json({ create: true });
+      throw new HTTPException(404, { message: "not found" });
     }
-    return c.json({ health: true });
+
+    const user = c.get("user");
+
+    if (!user) {
+      return c.json({ error: "unauthorized" }, 401);
+    }
+
+    const row = await db
+      .select({
+        loginId: users.loginId,
+        isAdmin: users.isAdmin,
+      })
+      .from(users)
+      .where(eq(users.loginId, user.cached))
+      .limit(1);
+    return c.json(row[0]);
   }
 )
+// 管理者アカウント作成
 .post(
   "/create",
   zValidator('json', z.object({
@@ -60,10 +101,12 @@ export const authApp = new Hono()
     await db.insert(users).values({
       loginId: body.loginId,
       passwordHash: hashPassword(body.password),
+      isAdmin: true,
     });
     return c.json({ ok: true, loginId: body.loginId });
   }
 )
+// ログイン
 .post("/login", async (c) => {
   const body = (await c.req.json().catch(() => null)) as {
     loginId?: string;
@@ -113,6 +156,7 @@ export const authApp = new Hono()
 
   return c.json({ ok: true, loginId: user.loginId });
 })
+// ログアウト
 .post("/logout", async (c) => {
   const sid = getCookie(c, SESSION_COOKIE);
   if (sid) {
@@ -129,28 +173,17 @@ export const authApp = new Hono()
   deleteCookie(c, SESSION_COOKIE, { path: "/" });
   return c.json({ ok: true });
 })
+// Nginx用 認証検証API
 .get("/verify", async (c) => {
-  const sid = getCookie(c, SESSION_COOKIE);
-  if (!sid) {
+  const user = c.get("user");
+  if (!user) {
     return c.body(null, 401);
-  }
-
-  const redis = getRedis();
-  if (redis) {
-    try {
-      const cached = await redis.get(sessionCacheKey(sid));
-      if (cached) {
-        return c.body(null, 204);
-      }
-    } catch (err) {
-      console.error("redis get (session)", err);
-    }
   }
 
   const row = await db
     .select()
     .from(sessions)
-    .where(eq(sessions.id, sid))
+    .where(eq(sessions.id, user.sid))
     .limit(1);
   const session = row[0];
   if (!session) {
@@ -158,10 +191,11 @@ export const authApp = new Hono()
     return c.body(null, 401);
   }
 
+  const redis = getRedis();
   if (redis) {
     try {
       await redis.setex(
-        sessionCacheKey(sid),
+        sessionCacheKey(user.sid),
         SESSION_MAX_AGE,
         session.loginId,
       );
@@ -172,3 +206,5 @@ export const authApp = new Hono()
 
   return c.body(null, 204);
 });
+
+export type AuthApp = typeof authApp;
