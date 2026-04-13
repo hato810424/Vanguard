@@ -39,6 +39,29 @@ export const authApp = new Hono()
       console.error("redis get (session)", err);
     }
   }
+
+  const row = await db
+    .select({ loginId: sessions.loginId })
+    .from(sessions)
+    .where(eq(sessions.id, sid))
+    .limit(1);
+  const session = row[0];
+  if (session) {
+    c.set("user", { cached: session.loginId, sid });
+    if (redis) {
+      try {
+        await redis.setex(
+          sessionCacheKey(sid),
+          SESSION_MAX_AGE,
+          session.loginId,
+        );
+      } catch (err) {
+        console.error("redis setex (session hydrate)", err);
+      }
+    }
+  }
+
+  return next();
 })
 // ユーザー情報取得
 .get(
