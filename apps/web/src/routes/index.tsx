@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { type SubmitEvent, useEffect, useState } from 'react'
 
 import { brand } from '../brand'
@@ -159,6 +159,11 @@ function LoginPage() {
           <p className={styles.desc}>
             <strong>{user.loginId}</strong> としてサインインしています。
           </p>
+          {user.isAdmin ? (
+            <Link to="/admin" className={styles.adminLink}>
+              管理画面を開く
+            </Link>
+          ) : null}
           {error ? (
             <p className={styles.error} role="alert">
               {error}

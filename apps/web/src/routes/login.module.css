@@ -109,6 +109,27 @@
   opacity: 0.55;
 }
 
+.adminLink {
+  box-sizing: border-box;
+  display: block;
+  margin: 0 0 1rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  color: var(--lagoon-deep);
+  border: 1px solid color-mix(in oklab, var(--lagoon-deep) 35%, var(--line));
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--lagoon) 22%, transparent);
+}
+
+.adminLink:hover {
+  background: color-mix(in oklab, var(--lagoon) 32%, transparent);
+}
+
 .logout {
   margin-top: 0.25rem;
   width: 100%;
