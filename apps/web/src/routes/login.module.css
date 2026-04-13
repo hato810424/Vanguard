@@ -116,16 +116,6 @@
   color: var(--sea-ink-soft);
 }
 
-.backLink {
-  font-weight: 600;
-  color: var(--lagoon-deep);
-  text-decoration: none;
-}
-
-.backLink:hover {
-  text-decoration: underline;
-}
-
 @media (min-width: 640px) {
   .card {
     padding: 2rem 2rem;
