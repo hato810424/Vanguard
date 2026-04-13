@@ -10,6 +10,7 @@ import { db } from "../db/dbConnect.js";
 import { sessions, users } from "../db/schema.js";
 import { getRedis, sessionCacheKey } from "../redis/client.js";
 import { HTTPException } from "hono/http-exception";
+import { adminApp } from "./auth/admin.js";
 
 const SESSION_COOKIE = "session";
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7;
@@ -34,7 +35,7 @@ function verifyPassword(password: string, stored: string): boolean {
   }
 }
 
-export const authApp = new Hono<{ Variables: { user: { cached: string; sid: string } } }>()
+export const authApp = new Hono()
 // 認証情報埋め込み
 .use(async (c, next) => {
   const sid = getCookie(c, SESSION_COOKIE);
@@ -205,6 +206,8 @@ export const authApp = new Hono<{ Variables: { user: { cached: string; sid: stri
   }
 
   return c.body(null, 204);
-});
+})
+// 管理者
+.route("/admin", adminApp);
 
 export type AuthApp = typeof authApp;
