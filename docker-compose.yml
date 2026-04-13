@@ -10,25 +10,18 @@ services:
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    networks:
-      - vanguard
 
   auth:
     build:
       context: .
       dockerfile: docker/auth/Dockerfile
     environment:
-      DB_FILE_NAME: /data/auth.db
+      DB_FILE_NAME: file:/database/db.sqlite
+      REDIS_URL: redis://redis:6379
     volumes:
-      - auth_data:/data
+      - ./docker/auth/database:/database
     expose:
       - "3001"
-    networks:
-      - vanguard
 
-volumes:
-  auth_data:
-
-networks:
-  vanguard:
-    driver: bridge
+  redis:
+    image: redis:latest

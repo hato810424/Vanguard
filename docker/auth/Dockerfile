@@ -18,7 +18,6 @@ COPY apps/auth ./apps/auth
 RUN pnpm run build
 
 ENV NODE_ENV=production
-ENV DB_FILE_NAME=./database/sqlite.db
 
 WORKDIR /app/apps/auth
 EXPOSE 3001
