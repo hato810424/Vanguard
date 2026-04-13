@@ -109,6 +109,29 @@
   opacity: 0.55;
 }
 
+.logout {
+  margin-top: 0.25rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--sea-ink);
+  cursor: pointer;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-strong);
+}
+
+.logout:hover:not(:disabled) {
+  background: color-mix(in oklab, var(--sea-ink-soft) 12%, var(--surface-strong));
+}
+
+.logout:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
 .footer {
   margin: 1.5rem 0 0;
   font-size: 0.875rem;

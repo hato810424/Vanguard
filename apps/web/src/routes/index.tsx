@@ -30,7 +30,7 @@ export const Route = createFileRoute('/')({
 type PageMode = 'login' | 'create'
 
 const $user = honoClient.index.$get;
-type UserResponse = InferResponseType<typeof $user>
+type UserResponse = InferResponseType<typeof $user, 200>
 
 function LoginPage() {
   const { next } = Route.useSearch()
@@ -55,8 +55,8 @@ function LoginPage() {
         }
 
         if (res.ok) {
-          const data = await res.json()
-          setUser(data as UserResponse)
+          const data = (await res.json()) as UserResponse
+          setUser(data)
         }
 
         setMode('login')
@@ -72,10 +72,12 @@ function LoginPage() {
   }, [])
 
   useEffect(() => {
-    document.title = isCreate
-      ? `${brand.name} - 管理者アカウントの作成`
-      : `${brand.name} - ログイン`
-  }, [isCreate])
+    document.title = user
+      ? `${brand.name} - ログイン済み`
+      : isCreate
+        ? `${brand.name} - 管理者アカウントの作成`
+        : `${brand.name} - ログイン`
+  }, [user, isCreate])
 
   async function postLogin(): Promise<boolean> {
     const res = await fetch('/_auth/api/login', {
@@ -128,6 +130,51 @@ function LoginPage() {
     } finally {
       setPending(false)
     }
+  }
+
+  async function onLogout() {
+    setError(null)
+    setPending(true)
+    try {
+      await fetch('/_auth/api/logout', {
+        method: 'POST',
+        credentials: 'include',
+      })
+      setUser(undefined)
+      setLoginId('')
+      setPassword('')
+    } catch {
+      setError('ログアウトに失敗しました。')
+    } finally {
+      setPending(false)
+    }
+  }
+
+  if (user) {
+    return (
+      <main className={styles.main}>
+        <section className={styles.card}>
+          <p className={styles.kicker}>{brand.loginKicker}</p>
+          <h1 className={styles.title}>ログイン済み</h1>
+          <p className={styles.desc}>
+            <strong>{user.loginId}</strong> としてサインインしています。
+          </p>
+          {error ? (
+            <p className={styles.error} role="alert">
+              {error}
+            </p>
+          ) : null}
+          <button
+            type="button"
+            disabled={pending}
+            className={styles.logout}
+            onClick={onLogout}
+          >
+            {pending ? 'ログアウト中…' : 'ログアウト'}
+          </button>
+        </section>
+      </main>
+    )
   }
 
   return (
