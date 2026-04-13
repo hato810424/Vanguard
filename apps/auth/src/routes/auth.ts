@@ -70,7 +70,7 @@ export const authApp = new Hono<{ Variables: { user: { cached: string; sid: stri
     const user = c.get("user");
 
     if (!user) {
-      return c.json({ error: "unauthorized" }, 401);
+      throw new HTTPException(401, { message: "unauthorized" });
     }
 
     const row = await db
