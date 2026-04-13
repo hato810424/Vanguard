@@ -1,4 +1,4 @@
-import { randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
+import { randomBytes } from "node:crypto";
 
 import { count, eq } from "drizzle-orm";
 import { Hono } from "hono";
@@ -9,31 +9,12 @@ import { deleteCookie, getCookie, setCookie } from "hono/cookie";
 import { db } from "../db/dbConnect.js";
 import { sessions, users } from "../db/schema.js";
 import { getRedis, sessionCacheKey } from "../redis/client.js";
+import { hashPassword, verifyPassword } from "../password.js";
 import { HTTPException } from "hono/http-exception";
 import { adminApp } from "./auth/admin.js";
 
 const SESSION_COOKIE = "session";
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7;
-
-function hashPassword(password: string): string {
-  const salt = randomBytes(16).toString("hex");
-  const hashBuf = scryptSync(password, salt, 64);
-  return `${salt}:${hashBuf.toString("hex")}`;
-}
-
-function verifyPassword(password: string, stored: string): boolean {
-  const parts = stored.split(":");
-  if (parts.length !== 2) return false;
-  const [salt, hash] = parts;
-  try {
-    const hashBuf = Buffer.from(hash, "hex");
-    const verifyBuf = scryptSync(password, salt, 64);
-    if (hashBuf.length !== verifyBuf.length) return false;
-    return timingSafeEqual(hashBuf, verifyBuf);
-  } catch {
-    return false;
-  }
-}
 
 export const authApp = new Hono()
 // 認証情報埋め込み
