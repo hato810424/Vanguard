@@ -2,6 +2,7 @@
   "name": "auth",
   "type": "module",
   "scripts": {
+    "db:push": "drizzle-kit push",
     "dev": "tsx watch ./src/index.ts",
     "build": "tsc",
     "start": "cross-env NODE_ENV=production node dist/index.js"

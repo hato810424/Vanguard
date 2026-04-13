@@ -1,6 +1,7 @@
 {
   "name": "Vanguard",
   "scripts": {
+    "db:push": "pnpm --filter=auth db:push",
     "build": "turbo build",
     "dev": "turbo dev",
     "start": "pnpm --filter=auth start"
