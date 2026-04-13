@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { type SubmitEvent, useEffect, useState } from 'react'
 
+import { brand } from '../brand'
 import styles from './login.module.css'
 
 function safeReturnPath(next: string | undefined): string {
@@ -33,6 +34,7 @@ function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
+  const isCreate = mode === 'create'
 
   useEffect(() => {
     let cancelled = false
@@ -58,6 +60,12 @@ function LoginPage() {
       cancelled = true
     }
   }, [])
+
+  useEffect(() => {
+    document.title = isCreate
+      ? `${brand.name} - 管理者アカウントの作成`
+      : `${brand.name} - ログイン`
+  }, [isCreate])
 
   async function postLogin(): Promise<boolean> {
     const res = await fetch('/_auth/api/login', {
@@ -112,12 +120,10 @@ function LoginPage() {
     }
   }
 
-  const isCreate = mode === 'create'
-
   return (
     <main className={styles.main}>
       <section className={styles.card}>
-        <p className={styles.kicker}>Account</p>
+        <p className={styles.kicker}>{brand.loginKicker}</p>
         <h1 className={styles.title}>
           {isCreate ? '管理者アカウントの作成' : 'ログイン'}
         </h1>
