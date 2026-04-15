@@ -159,6 +159,11 @@ function LoginPage() {
           <p className={styles.desc}>
             <strong>{user.loginId}</strong> としてサインインしています。
           </p>
+          
+          <a href="/" className={styles.adminLink}>
+            サービスに戻る
+          </a>
+          
           {user.isAdmin ? (
             <Link to="/admin" className={styles.adminLink}>
               管理画面を開く
