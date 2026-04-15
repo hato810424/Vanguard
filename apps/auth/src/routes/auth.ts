@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { randomBytes } from "node:crypto";
 
 import { count, eq } from "drizzle-orm";
@@ -14,8 +15,9 @@ import { HTTPException } from "hono/http-exception";
 import { adminApp } from "./auth/admin.js";
 import { passwordApp } from "./auth/password.js";
 
-const SESSION_COOKIE = "session";
-const SESSION_MAX_AGE = 60 * 60 * 24 * 7;
+const SESSION_COOKIE = process.env.SESSION_COOKIE_NAME || "session";
+const SESSION_MAX_AGE = 60 * 60 * 24 * parseInt(process.env.SESSION_MAX_AGE || "7");
+const HTTP_SECURE = process.env.HTTP_SECURE === "true";
 
 export const authApp = new Hono()
 // 認証情報埋め込み
@@ -156,7 +158,7 @@ export const authApp = new Hono()
     path: "/",
     httpOnly: true,
     sameSite: "Lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: HTTP_SECURE,
     maxAge: SESSION_MAX_AGE,
   });
 
