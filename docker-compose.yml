@@ -15,6 +15,9 @@ services:
     build:
       context: .
       dockerfile: docker/auth/Dockerfile
+      args:
+        - VITE_BRAND_NAME=Vanguard Auth
+        - VITE_BRAND_LOGIN_KICKER=Account
     environment:
       DB_FILE_NAME: file:/database/db.sqlite
       REDIS_URL: redis://redis:6379
