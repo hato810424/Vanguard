@@ -236,6 +236,17 @@
   background: color-mix(in oklab, #b42318 6%, transparent);
 }
 
+.success {
+  margin: 0;
+  padding: 0.55rem 0.65rem;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: color-mix(in oklab, #067647 88%, var(--sea-ink));
+  border: 1px solid color-mix(in oklab, #067647 28%, var(--line));
+  border-radius: 0.5rem;
+  background: color-mix(in oklab, #067647 8%, transparent);
+}
+
 .tableWrap {
   overflow-x: auto;
   margin-top: 0.5rem;

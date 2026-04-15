@@ -48,6 +48,11 @@ function RouteComponent() {
   const [newIsAdmin, setNewIsAdmin] = useState(false)
   const [creating, setCreating] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [newOwnPassword, setNewOwnPassword] = useState('')
+  const [confirmOwnPassword, setConfirmOwnPassword] = useState('')
+  const [passwordError, setPasswordError] = useState<string | null>(null)
+  const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null)
+  const [changingPassword, setChangingPassword] = useState(false)
 
   const loadUsers = useCallback(async () => {
     setListLoading(true)
@@ -112,6 +117,35 @@ function RouteComponent() {
     await loadUsers()
   }
 
+  async function onChangeOwnPassword(e: FormEvent) {
+    e.preventDefault()
+    setPasswordError(null)
+    setPasswordSuccess(null)
+    if (!newOwnPassword || !confirmOwnPassword) {
+      setPasswordError('新しいパスワードと確認を入力してください。')
+      return
+    }
+    if (newOwnPassword !== confirmOwnPassword) {
+      setPasswordError('新しいパスワードと確認が一致しません。')
+      return
+    }
+    setChangingPassword(true)
+    const res = await honoClient.password.$patch({
+      json: {
+        newPassword: newOwnPassword,
+        confirmNewPassword: confirmOwnPassword,
+      },
+    })
+    setChangingPassword(false)
+    if (!res.ok) {
+      setPasswordError(await parseErrorMessage(res))
+      return
+    }
+    setNewOwnPassword('')
+    setConfirmOwnPassword('')
+    setPasswordSuccess('パスワードを変更しました。')
+  }
+
   return (
     <div className={styles.page}>
       <div className={styles.inner}>
@@ -129,14 +163,70 @@ function RouteComponent() {
         </header>
 
         <div className={styles.grid}>
-          <section className={styles.card} aria-labelledby="admin-session-heading">
-            <h2 id="admin-session-heading" className={styles.cardTitle}>
-              セッション
+          <section
+            className={styles.card}
+            aria-labelledby="admin-change-password-heading"
+          >
+            <h2 id="admin-change-password-heading" className={styles.cardTitle}>
+              パスワード変更
             </h2>
-            <div className={styles.row}>
-              <span className={styles.loginId}>{sessionUser.loginId}</span>
-              <span className={styles.badge}>管理者</span>
-            </div>
+            <p className={styles.muted}>
+              管理者アカウントのパスワードを変更します。新しいパスワードと確認のみ入力してください。
+            </p>
+            <form
+              className={styles.form}
+              onSubmit={(e) => void onChangeOwnPassword(e)}
+            >
+              {passwordError ? (
+                <p className={styles.alert}>{passwordError}</p>
+              ) : null}
+              {passwordSuccess ? (
+                <p className={styles.success} role="status">
+                  {passwordSuccess}
+                </p>
+              ) : null}
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor="admin-new-own-password">
+                  新しいパスワード
+                </label>
+                <input
+                  id="admin-new-own-password"
+                  type="password"
+                  className={styles.input}
+                  autoComplete="new-password"
+                  value={newOwnPassword}
+                  onChange={(e) => {
+                    setNewOwnPassword(e.target.value)
+                    setPasswordSuccess(null)
+                  }}
+                />
+              </div>
+              <div className={styles.field}>
+                <label className={styles.label} htmlFor="admin-confirm-own-password">
+                  新しいパスワード（確認）
+                </label>
+                <input
+                  id="admin-confirm-own-password"
+                  type="password"
+                  className={styles.input}
+                  autoComplete="new-password"
+                  value={confirmOwnPassword}
+                  onChange={(e) => {
+                    setConfirmOwnPassword(e.target.value)
+                    setPasswordSuccess(null)
+                  }}
+                />
+              </div>
+              <div className={styles.actions}>
+                <button
+                  type="submit"
+                  className={styles.btn}
+                  disabled={changingPassword}
+                >
+                  {changingPassword ? '変更中…' : 'パスワードを変更'}
+                </button>
+              </div>
+            </form>
           </section>
 
           <section className={styles.card} aria-labelledby="admin-new-user-heading">

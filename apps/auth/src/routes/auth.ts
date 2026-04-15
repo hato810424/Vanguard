@@ -12,6 +12,7 @@ import { getRedis, sessionCacheKey } from "../redis/client.js";
 import { hashPassword, verifyPassword } from "../password.js";
 import { HTTPException } from "hono/http-exception";
 import { adminApp } from "./auth/admin.js";
+import { passwordApp } from "./auth/password.js";
 
 const SESSION_COOKIE = "session";
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7;
@@ -178,6 +179,8 @@ export const authApp = new Hono()
   deleteCookie(c, SESSION_COOKIE, { path: "/" });
   return c.json({ ok: true });
 })
+// ログイン中ユーザーのパスワード変更
+.route("/password", passwordApp)
 // Nginx用 認証検証API
 .get("/verify", async (c) => {
   const user = c.get("user");
