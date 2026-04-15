@@ -118,13 +118,13 @@ function RouteComponent() {
         <header className={styles.top}>
           <div>
             <p className={styles.kicker}>{brand.loginKicker}</p>
-            <h1 className={styles.title}>{brand.name} - 管理</h1>
+            <h1 className={styles.title}>{brand.name} - アカウント管理</h1>
             <p className={styles.sub}>
               ログアウトはトップ画面から行えます。
             </p>
           </div>
           <Link to="/" className={styles.back}>
-            トップへ
+            ログイン画面へ
           </Link>
         </header>
 
