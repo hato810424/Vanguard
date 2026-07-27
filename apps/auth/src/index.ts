@@ -1,24 +1,32 @@
+import { readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { serve } from '@hono/node-server'
 import { serveStatic } from '@hono/node-server/serve-static'
+import { migrate } from 'drizzle-orm/libsql/migrator'
 import { Hono } from 'hono'
-import { logger } from 'hono/logger'
 import { HTTPException } from 'hono/http-exception'
+import { logger } from 'hono/logger'
 
+import { db } from './db/dbConnect.js'
 import { authApp } from './routes/auth.js'
-import { readFileSync } from 'node:fs';
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
+const webDistRoot = resolve(__dirname, '../../web/dist')
+const isProd = process.env.NODE_ENV === 'production'
+
+if (isProd) {
+  await migrate(db, {
+    migrationsFolder: resolve(__dirname, '../database/migrations'),
+  })
+}
 
 const app = new Hono()
 
 // auth の routes を追加
 app.route('/_auth/api', authApp)
 app.all('/_auth/api/*', (c) => { throw new HTTPException(404, { message: 'not found' }) })
-
-const __dirname = dirname(fileURLToPath(import.meta.url))
-const webDistRoot = resolve(__dirname, '../../web/dist')
-const isProd = process.env.NODE_ENV === 'production'
 
 // API より先に静的ファイル（Vite base=/_auth と実パス dist/assets の差を吸収）
 if (isProd) {

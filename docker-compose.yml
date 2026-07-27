@@ -25,4 +25,4 @@ services:
       - ./docker/auth/database:/database
 
   redis:
-    image: redis:latest
+    image: redis:7-alpine

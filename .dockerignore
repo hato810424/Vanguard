@@ -8,3 +8,11 @@ node_modules
 .env
 .env.*
 !.env.example
+
+# ローカル DB・ドキュメント・nginx 設定はビルドに不要
+**/*.sqlite
+**/*.sqlite-*
+**/.DS_Store
+**/coverage
+docker/nginx
+docker/auth/database
